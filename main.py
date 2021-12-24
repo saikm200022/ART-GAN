@@ -32,7 +32,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from PIL import Image
-
+from Generator import *
 
 def load_dataset(dataset = 'cifar10'):
     data_root = 'data'
@@ -54,4 +54,6 @@ def load_dataset(dataset = 'cifar10'):
 
     return train_dataset, test_dataset
 
-load_dataset()
+# load_dataset()
+generator = Generator()
+print(generator(torch.rand(32, 3, 32, 32)).size())
