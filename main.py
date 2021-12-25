@@ -33,6 +33,7 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from PIL import Image
 from Generator import *
+from Discriminator import *
 
 def load_dataset(dataset = 'cifar10'):
     data_root = 'data'
@@ -55,5 +56,9 @@ def load_dataset(dataset = 'cifar10'):
     return train_dataset, test_dataset
 
 # load_dataset()
-generator = Generator()
-print(generator(torch.rand(32, 3, 32, 32)).size())
+# generator = Generator()
+# print(generator(torch.rand(32, 3, 32, 32)).size())
+
+# discrminator = Discriminator()
+# print(discrminator(torch.rand(32, 3, 32, 32)).size())
+
