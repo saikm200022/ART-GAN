@@ -55,10 +55,13 @@ def load_dataset(dataset = 'cifar10'):
 
     return train_dataset, test_dataset
 
-# load_dataset()
-# generator = Generator()
-# print(generator(torch.rand(32, 3, 32, 32)).size())
+def train():
+    train_data, test_dataset = load_dataset()
+    loss_f = torch.nn.BCELoss()
 
-# discrminator = Discriminator()
-# print(discrminator(torch.rand(32, 3, 32, 32)).size())
+    labels = [0, 1]
 
+    generator = Generator()
+    discriminator = Discriminator()
+    opt_generator = optim.Adam(generator.parameters(), lr = 1e-2)
+    opt_discriminator = optim.Adam(discriminator.parameters(), lr = 1e-2)
