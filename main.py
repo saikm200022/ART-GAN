@@ -58,10 +58,36 @@ def load_dataset(dataset = 'cifar10'):
 def train():
     train_data, test_dataset = load_dataset()
     loss_f = torch.nn.BCELoss()
-
+    epochs = 10
     labels = [0, 1]
 
     generator = Generator()
     discriminator = Discriminator()
     opt_generator = optim.Adam(generator.parameters(), lr = 1e-2)
     opt_discriminator = optim.Adam(discriminator.parameters(), lr = 1e-2)
+    for epoch in range(epochs):
+        for im, labels in enumerate(train_data):
+            ###################################
+            ####### Train Discriminator #######
+            ###################################
+            # Train with all real images
+            discriminator.zero_grad()
+            label = torch.full((im.size(0)), 1)
+            output = discriminator(im)
+            loss_d = loss_f(output, label)
+            loss_d.backward()
+
+            # Train with all fake images
+            input = torch.rand(im.size(0), 32, 32)
+            fake = generator(input)
+            label.fill_(0)
+            output = discriminator(input)
+            loss_fake = loss_f(output, label)
+            loss_fake.backward()
+
+            # Accumulate Loss
+            loss_d += loss_fake
+            opt_discriminator.step()
+
+            
+            
