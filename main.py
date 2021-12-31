@@ -78,7 +78,7 @@ def train():
             loss_d.backward()
 
             # Train with all fake images
-            input = torch.rand(im.size(0), 32, 32)
+            input = torch.rand(100, 32, 32)
             fake = generator(input)
             label.fill_(0)
             output = discriminator(input)
@@ -88,6 +88,14 @@ def train():
             # Accumulate Loss
             loss_d += loss_fake
             opt_discriminator.step()
+
+            ##################################
+            ###### Train Generator ###########
+            ##################################
+            generator.zero_grad()
+            label.fill_(1)
+            output = discriminator(fake)
+
 
             
             
