@@ -96,6 +96,6 @@ def train():
             label.fill_(1)
             output = discriminator(fake)
 
-
+train_data, test_data = load_dataset()
             
             
