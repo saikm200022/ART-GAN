@@ -21,4 +21,7 @@ class Discriminator(torch.nn.Module):
         )
     
     def forward(self, inp):
-        return self.network(inp)
+        return self.network(inp)[:,:, 0, 0]
+
+discriminator = Discriminator()
+print(discriminator(torch.rand(64, 3, 32, 32)).size())
