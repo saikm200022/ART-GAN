@@ -35,6 +35,7 @@ from PIL import Image
 from Generator import *
 from Discriminator import *
 from tqdm import tqdm
+import datetime
 
 def load_dataset(dataset = 'cifar10', batch_size = 32):
     data_root = 'data'
@@ -58,6 +59,23 @@ def load_dataset(dataset = 'cifar10', batch_size = 32):
 
     return train_loader, test_loader
 
+def save_model(model, file_name):
+    from torch import save
+    from os import path
+    print("saving", file_name)
+    return save(model.state_dict(), file_name)
+
+
+def load_model(file):
+    from torch import load
+    from os import path
+    gen = Generator()
+    gen.load_state_dict(load(path.join(path.dirname(path.abspath(__file__)), file), map_location='cpu'))
+    return gen
+
+def GetNumberParameters(model):
+  return sum(np.prod(p.shape).item() for p in model.parameters())
+
 def train():
     train_data, test_dataset = load_dataset()
     loss_f = torch.nn.BCELoss()
@@ -68,6 +86,8 @@ def train():
 
     generator = Generator()
     discriminator = Discriminator()
+    print("Parameters of Generator: ", GetNumberParameters(generator))
+    print("Parameters of Discriminator: ", GetNumberParameters(discriminator))
     opt_generator = optim.Adam(generator.parameters(), lr = 1e-2)
     opt_discriminator = optim.Adam(discriminator.parameters(), lr = 1e-2)
     for epoch in range(epochs):
@@ -86,7 +106,7 @@ def train():
             loss_d.backward()
 
             # Train with all fake images
-            inp = torch.rand(32, 100, 1, 1, device = device)
+            inp = torch.rand(im.size(0), 100, 1, 1, device = device)
             fake = generator(inp)
             label.fill_(0)
             output = discriminator(fake.detach())
@@ -110,5 +130,10 @@ def train():
             G_loss.append(loss_g)
             D_loss.append(loss_d)
 
-train()            
-            
+        if epoch % 5 == 0:
+            save_model(generator, "gen" + str(datetime.datetime.now().time()) + ".th")
+            save_model(discriminator, "disc" + str(datetime.datetime.now().time()) + ".th")
+
+# train()            
+model = load_model('gen12:25:44.582487'+".th")
+
