@@ -81,6 +81,7 @@ def train():
     train_data, test_dataset = load_dataset()
     loss_f = torch.nn.BCELoss()
     epochs = 10
+    lr = 1e-4
     G_loss = []
     D_loss = []
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
@@ -89,13 +90,16 @@ def train():
     discriminator = Discriminator()
     print("Parameters of Generator: ", GetNumberParameters(generator))
     print("Parameters of Discriminator: ", GetNumberParameters(discriminator))
-    opt_generator = optim.Adam(generator.parameters(), lr = 1e-2)
-    opt_discriminator = optim.Adam(discriminator.parameters(), lr = 1e-2)
+    opt_generator = optim.Adam(generator.parameters(), lr = lr)
+    opt_discriminator = optim.Adam(discriminator.parameters(), lr = lr)
     for epoch in range(epochs):
-        for im, labels in tqdm(train_data):
+        print("EPOCH: ", epoch)
+        for im, labels in train_data:
             im = im.to(device)
             labels = labels.to(device)
-
+            loss_d = 0
+            loss_g = 0
+            
             ###################################
             ####### Train Discriminator #######
             ###################################
@@ -131,6 +135,8 @@ def train():
             G_loss.append(loss_g)
             D_loss.append(loss_d)
 
+            print("G LOSS: ", loss_g.item(), "D LOSS: ", loss_d.item())
+
         if epoch % 5 == 0:
             save_model(generator, "gen" + str(datetime.datetime.now().time()) + ".th")
             save_model(discriminator, "disc" + str(datetime.datetime.now().time()) + ".th")
@@ -152,6 +158,6 @@ def DisplayArt(path):
     # Displaying the image
     cv2.imshow('image', img)
 
-# train()
+train()
 # GenerateArt('gen12:25:44.582487'+".th")
 # DisplayArt('./art.png')
