@@ -90,7 +90,7 @@ def train():
     train_data, test_dataset = load_dataset()
     loss_f = torch.nn.BCEWithLogitsLoss()
     epochs = 10
-    lr = 1e-2 
+    lr = 1e-3
     G_loss = []
     D_loss = []
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
@@ -101,12 +101,17 @@ def train():
     generator.apply(weights_init)
     discriminator.apply(weights_init)
 
+    if torch.cuda.is_available():
+      generator.cuda()
+      discriminator.cuda()
+
     print("Parameters of Generator: ", GetNumberParameters(generator))
     print("Parameters of Discriminator: ", GetNumberParameters(discriminator))
     opt_generator = optim.Adam(generator.parameters(), lr = lr)
     opt_discriminator = optim.Adam(discriminator.parameters(), lr = lr)
     for epoch in range(epochs):
         print("EPOCH: ", epoch)
+        iter = 0
         for im, labels in train_data:
             im = im.to(device)
             labels = labels.to(device)
@@ -124,7 +129,7 @@ def train():
             loss_d.backward()
 
             # Train with all fake images
-            inp = torch.rand(im.size(0), 100, 1, 1, device = device)
+            inp = torch.randn(im.size(0), 100, 1, 1, device = device)
             fake = generator(inp)
             label.fill_(0.)
             output = discriminator(fake.detach())
@@ -147,9 +152,10 @@ def train():
 
             G_loss.append(loss_g)
             D_loss.append(loss_d)
+            if iter % 100 == 0:
+              print("G LOSS: ", loss_g.item(), "D LOSS: ", loss_d.item())
 
-            print("G LOSS: ", loss_g.item(), "D LOSS: ", loss_d.item())
-
+            iter += 1
         if epoch % 5 == 0:
             save_model(generator, "gen" + str(datetime.datetime.now().time()) + ".th")
             save_model(discriminator, "disc" + str(datetime.datetime.now().time()) + ".th")
@@ -160,9 +166,14 @@ def GenerateArt(model_name, latent_dim = 100):
     model = load_model(model_name)
     latent_vector = torch.randn(1, latent_dim, 1, 1)
     art = model(latent_vector)[0, :, :, :]
-    output = art.detach().numpy()
-    output = np.reshape(output, (32, 32, 3))
-    cv2.imwrite('art.png', output)
+    print(art)
+    # output = art.detach().numpy()
+    # output = np.reshape(output, (32, 32, 3))
+    # cv2.imwrite('art.png', output)    from torchvision import transforms
+    im = transforms.ToPILImage()(art).convert("RGB")
+    im = im.resize((1080, 1080))
+    im1 = im.save("art.bmp")
+
     print("Viola! Art is Generated!")
 
 def DisplayArt(path):
@@ -172,5 +183,5 @@ def DisplayArt(path):
     cv2.imshow('image', img)
 
 train()
-# GenerateArt('gen22:07:27.128614'+".th")
+# GenerateArt('gen04:42:26.944590'+".th")
 # DisplayArt('./art.png')
