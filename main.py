@@ -38,15 +38,24 @@ from tqdm import tqdm
 import datetime
 import cv2
 
-def load_dataset(dataset = 'cifar10', batch_size = 32):
+def weights_init(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
+    elif classname.find('BatchNorm') != -1:
+        nn.init.normal_(m.weight.data, 1.0, 0.02)
+        nn.init.constant_(m.bias.data, 0)
+
+def load_dataset(dataset = 'cifar10', batch_size = 128):
     data_root = 'data'
     data_root = os.path.abspath(os.path.expanduser(data_root))
     root_dir = os.path.join(data_root, dataset)
     transform_train = transforms.Compose([
-            transforms.RandomHorizontalFlip(p = 0.5),
-            transforms.ColorJitter(brightness=0.5, hue = 0.25),
-            transforms.ToTensor(),
-        ])
+                               transforms.Resize(32),
+                               transforms.CenterCrop(32),
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                           ])
 
     transform_test = transforms.Compose([
             transforms.ToTensor(),
@@ -79,15 +88,19 @@ def GetNumberParameters(model):
 
 def train():
     train_data, test_dataset = load_dataset()
-    loss_f = torch.nn.BCELoss()
+    loss_f = torch.nn.BCEWithLogitsLoss()
     epochs = 10
-    lr = 1e-4
+    lr = 1e-2 
     G_loss = []
     D_loss = []
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
 
     generator = Generator()
     discriminator = Discriminator()
+
+    generator.apply(weights_init)
+    discriminator.apply(weights_init)
+
     print("Parameters of Generator: ", GetNumberParameters(generator))
     print("Parameters of Discriminator: ", GetNumberParameters(discriminator))
     opt_generator = optim.Adam(generator.parameters(), lr = lr)
@@ -105,7 +118,7 @@ def train():
             ###################################
             # Train with all real images
             discriminator.zero_grad()
-            label = torch.full((im.size(0),), 1, dtype = torch.float, device = device)
+            label = torch.full((im.size(0),), 0.9, dtype = torch.float, device = device)
             output = discriminator(im)
             loss_d = loss_f(output.view(-1), label)
             loss_d.backward()
@@ -113,7 +126,7 @@ def train():
             # Train with all fake images
             inp = torch.rand(im.size(0), 100, 1, 1, device = device)
             fake = generator(inp)
-            label.fill_(0)
+            label.fill_(0.)
             output = discriminator(fake.detach())
             loss_fake = loss_f(output.view(-1), label)
             loss_fake.backward()
@@ -126,7 +139,7 @@ def train():
             ###### Train Generator ###########
             ##################################
             generator.zero_grad()
-            label.fill_(1)
+            label.fill_(0.9)
             output = discriminator(fake)
             loss_g = loss_f(output.view(-1), label)
             loss_g.backward()
@@ -159,5 +172,5 @@ def DisplayArt(path):
     cv2.imshow('image', img)
 
 train()
-# GenerateArt('gen12:25:44.582487'+".th")
+# GenerateArt('gen22:07:27.128614'+".th")
 # DisplayArt('./art.png')

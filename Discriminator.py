@@ -16,8 +16,7 @@ class Discriminator(torch.nn.Module):
             torch.nn.Conv2d(128, 256, 4, 2, 1),
             torch.nn.BatchNorm2d(256),
             torch.nn.ReLU(),
-            torch.nn.Conv2d(256, 1, 2, 1, 0),
-            torch.nn.Sigmoid()
+            torch.nn.Conv2d(256, 1, 2, 1, 0)
         )
     
     def forward(self, inp):
