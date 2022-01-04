@@ -36,6 +36,7 @@ from Generator import *
 from Discriminator import *
 from tqdm import tqdm
 import datetime
+import cv2
 
 def load_dataset(dataset = 'cifar10', batch_size = 32):
     data_root = 'data'
@@ -134,6 +135,23 @@ def train():
             save_model(generator, "gen" + str(datetime.datetime.now().time()) + ".th")
             save_model(discriminator, "disc" + str(datetime.datetime.now().time()) + ".th")
 
-# train()            
-model = load_model('gen12:25:44.582487'+".th")
+def GenerateArt(model_name, latent_dim = 100):
+    from torchvision import transforms
 
+    model = load_model(model_name)
+    latent_vector = torch.randn(1, latent_dim, 1, 1)
+    art = model(latent_vector)[0, :, :, :]
+    output = art.detach().numpy()
+    output = np.reshape(output, (32, 32, 3))
+    cv2.imwrite('art.png', output)
+    print("Viola! Art is Generated!")
+
+def DisplayArt(path):
+    img = cv2.imread(path)
+    
+    # Displaying the image
+    cv2.imshow('image', img)
+
+# train()
+# GenerateArt('gen12:25:44.582487'+".th")
+# DisplayArt('./art.png')
