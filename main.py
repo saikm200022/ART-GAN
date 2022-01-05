@@ -98,16 +98,17 @@ def train(pretrained = False, gen_path = "", disc_path = ""):
     generator = Generator()
     discriminator = Discriminator()
 
-    if pretrained:
-        generator.load_state_dict(torch.load(gen_path, map_location='cpu'))
-        discriminator.load_state_dict(torch.load(disc_path, map_location='cpu'))
-
     generator.apply(weights_init)
     discriminator.apply(weights_init)
 
     if torch.cuda.is_available():
       generator.cuda()
       discriminator.cuda()
+
+    if pretrained:
+        print("Load Pretrained Models")
+        generator.load_state_dict(torch.load(gen_path, map_location='cpu'))
+        discriminator.load_state_dict(torch.load(disc_path, map_location='cpu'))
 
     print("Parameters of Generator: ", GetNumberParameters(generator))
     print("Parameters of Discriminator: ", GetNumberParameters(discriminator))
@@ -186,6 +187,6 @@ def DisplayArt(path):
     # Displaying the image
     cv2.imshow('image', img)
 
-train()
+train(pretrained = True, gen_path = "../gen45.th", disc_path = "../disc45.th")
 # GenerateArt('gen17:17:27.803344'+".th")
 # DisplayArt('./art.png')
