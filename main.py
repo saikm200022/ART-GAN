@@ -86,7 +86,7 @@ def load_model(file):
 def GetNumberParameters(model):
   return sum(np.prod(p.shape).item() for p in model.parameters())
 
-def train():
+def train(pretrained = False, gen_path = "", disc_path = ""):
     train_data, test_dataset = load_dataset()
     loss_f = torch.nn.BCEWithLogitsLoss()
     epochs = 51
@@ -97,6 +97,10 @@ def train():
 
     generator = Generator()
     discriminator = Discriminator()
+
+    if pretrained:
+        generator.load_state_dict(torch.load(gen_path, map_location='cpu'))
+        discriminator.load_state_dict(torch.load(disc_path, map_location='cpu'))
 
     generator.apply(weights_init)
     discriminator.apply(weights_init)
@@ -117,7 +121,7 @@ def train():
             labels = labels.to(device)
             loss_d = 0
             loss_g = 0
-
+            
             ###################################
             ####### Train Discriminator #######
             ###################################
