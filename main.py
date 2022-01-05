@@ -89,8 +89,8 @@ def GetNumberParameters(model):
 def train():
     train_data, test_dataset = load_dataset()
     loss_f = torch.nn.BCEWithLogitsLoss()
-    epochs = 10
-    lr = 1e-3
+    epochs = 51
+    lr = 1e-5
     G_loss = []
     D_loss = []
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
@@ -112,12 +112,12 @@ def train():
     for epoch in range(epochs):
         print("EPOCH: ", epoch)
         iter = 0
-        for im, labels in train_data:
+        for im, labels in tqdm(train_data):
             im = im.to(device)
             labels = labels.to(device)
             loss_d = 0
             loss_g = 0
-            
+
             ###################################
             ####### Train Discriminator #######
             ###################################
@@ -152,7 +152,7 @@ def train():
 
             G_loss.append(loss_g)
             D_loss.append(loss_d)
-            if iter % 100 == 0:
+            if iter % 200 == 0:
               print("G LOSS: ", loss_g.item(), "D LOSS: ", loss_d.item())
 
             iter += 1
@@ -183,5 +183,5 @@ def DisplayArt(path):
     cv2.imshow('image', img)
 
 train()
-# GenerateArt('gen04:42:26.944590'+".th")
+# GenerateArt('gen17:17:27.803344'+".th")
 # DisplayArt('./art.png')

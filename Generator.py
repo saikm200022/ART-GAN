@@ -10,16 +10,16 @@ class Generator(torch.nn.Module):
         self.network = torch.nn.Sequential(
             torch.nn.ConvTranspose2d(100, 64 * 8, 4, 1, 0),
             torch.nn.BatchNorm2d(64 * 8),
-            torch.nn.ReLU(),
+            torch.nn.LeakyReLU(0.2),
             torch.nn.ConvTranspose2d(64 * 8, 64 * 4, 4, 2, 1),
             torch.nn.BatchNorm2d(64 * 4),
-            torch.nn.ReLU(),
+            torch.nn.LeakyReLU(0.2),
             torch.nn.ConvTranspose2d(64 * 4, 64 * 2, 4, 2, 1),
             torch.nn.BatchNorm2d(64 * 2),
-            torch.nn.ReLU(),
+            torch.nn.LeakyReLU(0.2),
             torch.nn.ConvTranspose2d(64 * 2, 64, 4, 2, 1),
             torch.nn.BatchNorm2d(64),
-            torch.nn.ReLU(),
+            torch.nn.LeakyReLU(0.2),
             torch.nn.ConvTranspose2d(64, 3, 5, 1, 2),
             torch.nn.Tanh()
         )
