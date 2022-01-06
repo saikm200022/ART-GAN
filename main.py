@@ -37,6 +37,7 @@ from Discriminator import *
 from tqdm import tqdm
 import datetime
 import cv2
+from ArtDataLoader import *
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -52,7 +53,6 @@ def load_dataset(dataset = 'cifar10', batch_size = 128):
     root_dir = os.path.join(data_root, dataset)
     transform_train = transforms.Compose([
                                transforms.Resize(32),
-                               transforms.CenterCrop(32),
                                transforms.ToTensor(),
                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                            ])
@@ -75,7 +75,6 @@ def save_model(model, file_name):
     print("saving", file_name)
     return save(model.state_dict(), file_name)
 
-
 def load_model(file):
     from torch import load
     from os import path
@@ -86,10 +85,13 @@ def load_model(file):
 def GetNumberParameters(model):
   return sum(np.prod(p.shape).item() for p in model.parameters())
 
-def train(pretrained = False, gen_path = "", disc_path = ""):
-    train_data, test_dataset = load_dataset()
+def train(pretrained = False, art_data = False, gen_path = "", disc_path = ""):
+    if art_data:
+        train_data = ArtDataLoader()
+    else:
+        train_data, test_dataset = load_dataset()
     loss_f = torch.nn.BCEWithLogitsLoss()
-    epochs = 51
+    epochs = 101
     lr = 1e-5
     G_loss = []
     D_loss = []
@@ -117,9 +119,12 @@ def train(pretrained = False, gen_path = "", disc_path = ""):
     for epoch in range(epochs):
         print("EPOCH: ", epoch)
         iter = 0
-        for im, labels in tqdm(train_data):
+        for data in tqdm(train_data):
+            if art_data:
+                im = data[None, :, :, :]
+            else:
+                im = data[0]
             im = im.to(device)
-            labels = labels.to(device)
             loss_d = 0
             loss_g = 0
             
@@ -157,7 +162,7 @@ def train(pretrained = False, gen_path = "", disc_path = ""):
 
             G_loss.append(loss_g)
             D_loss.append(loss_d)
-            if iter % 200 == 0:
+            if iter % 100 == 0:
               print("G LOSS: ", loss_g.item(), "D LOSS: ", loss_d.item())
 
             iter += 1
@@ -187,6 +192,6 @@ def DisplayArt(path):
     # Displaying the image
     cv2.imshow('image', img)
 
-train(pretrained = True, gen_path = "../gen45.th", disc_path = "../disc45.th")
+train(pretrained = True, art_data = True, gen_path = "gen600.th", disc_path = "disc600.th")
 # GenerateArt('gen17:17:27.803344'+".th")
 # DisplayArt('./art.png')
