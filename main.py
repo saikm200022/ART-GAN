@@ -52,10 +52,9 @@ def create_data(model_name, latent_dim, num_images = 16, dir = "./additional_dat
         save_image(art[0], './' + dir + '/' + str(i + 1) + '.jpeg')
     print("Voila! Additional Data is Generated!")
 
-
-model_name = './gen490'+".th"
+model_name = './model_checkpoints/generator'+".th"
 latent_dim = 100
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
 
-# grid_view(model_name = './gen490.th', latent_dim = 100)
-create_data(model_name, latent_dim, num_images = 128, dir = "./generated_data")
+grid_view(model_name, latent_dim = 100)
+# create_data(model_name, latent_dim, num_images = 128, dir = "./generated_data")
