@@ -1,33 +1,19 @@
-from __future__ import print_function
-#%matplotlib inline
-import argparse
+'''
+
+Main entrypoint into code that can display generated images in grid format as well as 
+a utility function that can create a directory and save generated data images.
+
+'''
+
 import os
-import random
 import torch
-import torch.nn as nn
-import torch.nn.parallel
-import torch.backends.cudnn as cudnn
-import torch.optim as optim
-import torch.utils.data
-import torchvision.datasets as dset
-import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from IPython.display import HTML
-import torch.nn.functional as F
-import torch.optim as optim
-from torchvision import datasets, transforms
 from PIL import Image
-from Generator import *
-from Discriminator import *
-from tqdm import tqdm
-import datetime
-import cv2
+from architecture.Generator import *
+from architecture.Discriminator import *
 from torchvision.utils import save_image
-
-from torchvision import transforms
 
 def grid_view(model_name, latent_dim):
     model = Generator()
