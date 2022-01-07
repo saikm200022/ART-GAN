@@ -1,3 +1,9 @@
+'''
+
+Template code to build a pytorch dataloader using the new generated data.
+
+'''
+
 import torch
 import torchvision.transforms
 import os 
