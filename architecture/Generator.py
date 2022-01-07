@@ -1,5 +1,7 @@
 '''
-Generator Code - Generates Images with latent vector input
+
+Generator Model Architecture - Generates Images with latent vector input. Comprised of up convolutions.
+
 '''
 
 import torch

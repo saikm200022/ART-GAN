@@ -1,3 +1,10 @@
+'''
+
+Discriminator model architecture which is essentially a Convolutional Neural Network (CNN).
+
+'''
+
+
 import torch
 
 class Discriminator(torch.nn.Module):
