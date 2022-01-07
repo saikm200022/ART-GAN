@@ -20,11 +20,11 @@ def grid_view(model_name, latent_dim):
     model.load_state_dict(torch.load(model_name, map_location='cpu'))
 
     latent_vector = torch.randn(128, latent_dim, 1, 1)
-    art = model(latent_vector)
+    output = model(latent_vector)
     plt.figure(figsize=(32,32))
     plt.axis("off")
     plt.title("Examples of Generated Data")
-    plt.imshow(np.transpose(vutils.make_grid(art.to(device), padding = 0, normalize=True).cpu(),(1,2,0)))
+    plt.imshow(np.transpose(vutils.make_grid(output.to(device), padding = 0, normalize=True).cpu(),(1,2,0)))
     plt.show()
 
 def create_data(model_name, latent_dim, num_images = 16, dir = "./additional_data"):
@@ -34,8 +34,8 @@ def create_data(model_name, latent_dim, num_images = 16, dir = "./additional_dat
 
     for i in range(num_images):
         latent_vector = torch.randn(128, latent_dim, 1, 1)
-        art = model(latent_vector)
-        save_image(art[0], './' + dir + '/' + str(i + 1) + '.jpeg')
+        output = model(latent_vector)
+        save_image(output[0], './' + dir + '/' + str(i + 1) + '.jpeg')
     print("Voila! Additional Data is Generated!")
 
 model_name = './model_checkpoints/generator'+".th"

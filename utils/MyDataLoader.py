@@ -15,11 +15,11 @@ from PIL import Image
 
 class MyDataLoader(torch.utils.data.Dataset):
     def __init__(self):
-        directory = './art_data'
+        directory = './generated_data'
         self.dataset = []
         for filename in os.listdir(directory):
             if filename.endswith(".jpeg"):
-                im = cv2.imread("./art_data/" + filename)
+                im = cv2.imread("./generated_data" + filename)
                 self.dataset.append(im)
                 
     def __getitem__(self, idx):
